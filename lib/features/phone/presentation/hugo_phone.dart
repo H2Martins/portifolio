@@ -162,6 +162,11 @@ class _PhoneFrameState extends State<_PhoneFrame> {
                                 key: const ValueKey('home'),
                                 onOpen: _open,
                               )
+                            : _openApp!.isContact
+                            ? _ContactScreen(
+                                key: const ValueKey('contact'),
+                                onBack: _goHome,
+                              )
                             : _AppScreen(
                                 key: ValueKey(_openApp!.title),
                                 app: _openApp!,
@@ -254,7 +259,7 @@ class _HomeScreen extends StatelessWidget {
       subtitle: 'Vamos construir algo',
       icon: Icons.alternate_email_rounded,
       colors: [Color(0xFFFFB86B), Color(0xFFDB6238)],
-      url: 'mailto:hugohenrique.dev@gmail.com',
+      isContact: true,
     ),
   ];
 
@@ -473,6 +478,287 @@ class _AppScreen extends StatelessWidget {
   );
 }
 
+class _ContactScreen extends StatelessWidget {
+  const _ContactScreen({super.key, required this.onBack});
+
+  final VoidCallback onBack;
+
+  Future<void> _openLink(BuildContext context, String url) async {
+    final opened = await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível abrir este contato.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(22, 12, 22, 12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            IconButton(
+              tooltip: 'Voltar à tela inicial',
+              onPressed: onBack,
+              icon: const Icon(Icons.arrow_back_rounded),
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF72E6B1).withValues(alpha: .1),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(
+                  color: const Color(0xFF72E6B1).withValues(alpha: .22),
+                ),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _StatusDot(),
+                  SizedBox(width: 7),
+                  Text(
+                    'DISPONÍVEL',
+                    style: TextStyle(
+                      color: Color(0xFF8FE8BD),
+                      fontSize: 8,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(2, 22, 2, 18),
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 62,
+                    height: 62,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFFFFB86B), Color(0xFFDB6238)],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x35DB6238),
+                          blurRadius: 24,
+                          offset: Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: const Text(
+                      'HM',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hugo Martins',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -.4,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Full Stack Developer',
+                          style: TextStyle(
+                            color: Color(0xFF999AA4),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              const Text(
+                'Vamos construir\nalgo relevante.',
+                style: TextStyle(
+                  fontSize: 34,
+                  height: 1.02,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -1.4,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Escolha o canal mais conveniente. Estou sempre aberto a boas conversas e novos desafios.',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: .5),
+                  fontSize: 13,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 28),
+              _ContactTile(
+                label: 'LOCALIDADE',
+                value: 'Araçoiaba da Serra · SP',
+                icon: Icons.location_on_outlined,
+                accent: const Color(0xFF9B8CFF),
+                onTap: () => _openLink(
+                  context,
+                  'https://www.google.com/maps/search/?api=1&query=Ara%C3%A7oiaba%20da%20Serra%20SP',
+                ),
+              ),
+              const SizedBox(height: 10),
+              _ContactTile(
+                label: 'E-MAIL',
+                value: 'hhugomts@gmail.com',
+                icon: Icons.alternate_email_rounded,
+                accent: const Color(0xFFFFB86B),
+                onTap: () => _openLink(context, 'mailto:hhugomts@gmail.com'),
+              ),
+              const SizedBox(height: 10),
+              _ContactTile(
+                label: 'TELEFONE',
+                value: '(15) 99610-6082',
+                icon: Icons.phone_outlined,
+                accent: const Color(0xFF72E6B1),
+                onTap: () => _openLink(context, 'tel:+5515996106082'),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _ContactTile extends StatefulWidget {
+  const _ContactTile({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.accent,
+    required this.onTap,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color accent;
+  final VoidCallback onTap;
+
+  @override
+  State<_ContactTile> createState() => _ContactTileState();
+}
+
+class _ContactTileState extends State<_ContactTile> {
+  bool hovered = false;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: '${widget.label}: ${widget.value}',
+    child: AnimatedContainer(
+      duration: 180.ms,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: hovered ? .09 : .055),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: hovered
+              ? widget.accent.withValues(alpha: .38)
+              : Colors.white.withValues(alpha: .08),
+        ),
+      ),
+      child: InkWell(
+        onTap: widget.onTap,
+        onHover: (value) => setState(() => hovered = value),
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: widget.accent.withValues(alpha: .12),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(widget.icon, color: widget.accent, size: 20),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.label,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: .35),
+                        fontSize: 8,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.value,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_outward_rounded,
+                color: Colors.white.withValues(alpha: .3),
+                size: 18,
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+class _StatusDot extends StatelessWidget {
+  const _StatusDot();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 6,
+    height: 6,
+    decoration: const BoxDecoration(
+      color: Color(0xFF72E6B1),
+      shape: BoxShape.circle,
+      boxShadow: [BoxShadow(color: Color(0x9972E6B1), blurRadius: 6)],
+    ),
+  );
+}
+
 class _HomeIndicator extends StatelessWidget {
   const _HomeIndicator({required this.onTap});
 
@@ -540,6 +826,7 @@ class _PhoneApp {
     required this.colors,
     this.url,
     this.description,
+    this.isContact = false,
   });
 
   final String title;
@@ -548,4 +835,5 @@ class _PhoneApp {
   final List<Color> colors;
   final String? url;
   final String? description;
+  final bool isContact;
 }

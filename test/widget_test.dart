@@ -46,5 +46,14 @@ void main() {
 
     expect(find.text('PROJETO EM BREVE'), findsOneWidget);
     expect(find.textContaining('plataforma conectada'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Voltar à tela inicial'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Contato'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Araçoiaba da Serra · SP'), findsOneWidget);
+    expect(find.text('hhugomts@gmail.com'), findsOneWidget);
+    expect(find.text('(15) 99610-6082'), findsOneWidget);
   });
 }
