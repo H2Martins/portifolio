@@ -54,7 +54,18 @@ class _PhoneOverlay extends StatelessWidget {
           ),
           SafeArea(
             minimum: EdgeInsets.all(compact ? 0 : 24),
-            child: Center(child: _PhoneFrame(fullScreen: compact)),
+            child: Center(
+              child: compact
+                  ? const _PhoneFrame(fullScreen: true)
+                  : const FittedBox(
+                      fit: BoxFit.contain,
+                      child: SizedBox(
+                        width: 500,
+                        height: 900,
+                        child: _PhoneFrame(fullScreen: false),
+                      ),
+                    ),
+            ),
           ),
           if (!compact)
             Positioned(
@@ -105,11 +116,12 @@ class _PhoneFrameState extends State<_PhoneFrame> {
 
   @override
   Widget build(BuildContext context) {
-    final radius = widget.fullScreen ? 0.0 : 48.0;
+    final radius = widget.fullScreen ? 0.0 : 52.0;
     return Container(
-      width: widget.fullScreen ? double.infinity : 390,
-      height: widget.fullScreen ? double.infinity : 790,
-      padding: EdgeInsets.all(widget.fullScreen ? 0 : 8),
+      key: const ValueKey('hugo-phone-frame'),
+      width: widget.fullScreen ? double.infinity : 500,
+      height: widget.fullScreen ? double.infinity : 900,
+      padding: EdgeInsets.all(widget.fullScreen ? 0 : 7),
       decoration: BoxDecoration(
         color: const Color(0xFF030406),
         borderRadius: BorderRadius.circular(radius),
@@ -132,7 +144,7 @@ class _PhoneFrameState extends State<_PhoneFrame> {
               ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(widget.fullScreen ? 0 : 40),
+        borderRadius: BorderRadius.circular(widget.fullScreen ? 0 : 45),
         child: ColoredBox(
           color: const Color(0xFF0B0C10),
           child: Stack(
@@ -165,6 +177,11 @@ class _PhoneFrameState extends State<_PhoneFrame> {
                             : _openApp!.isContact
                             ? _ContactScreen(
                                 key: const ValueKey('contact'),
+                                onBack: _goHome,
+                              )
+                            : _openApp!.isAbout
+                            ? _AboutScreen(
+                                key: const ValueKey('about'),
                                 onBack: _goHome,
                               )
                             : _AppScreen(
@@ -225,11 +242,11 @@ class _HomeScreen extends StatelessWidget {
 
   static const apps = [
     _PhoneApp(
-      title: 'LinkedIn',
-      subtitle: 'Perfil profissional',
-      icon: Icons.work_outline_rounded,
-      colors: [Color(0xFF1785D1), Color(0xFF005A9E)],
-      url: _linkedInUrl,
+      title: 'Contato',
+      subtitle: 'Vamos construir algo',
+      icon: Icons.alternate_email_rounded,
+      colors: [Color(0xFFFFB86B), Color(0xFFDB6238)],
+      isContact: true,
     ),
     _PhoneApp(
       title: 'GitHub',
@@ -237,6 +254,13 @@ class _HomeScreen extends StatelessWidget {
       icon: Icons.code_rounded,
       colors: [Color(0xFF34343D), Color(0xFF17171C)],
       url: _githubUrl,
+    ),
+    _PhoneApp(
+      title: 'LinkedIn',
+      subtitle: 'Perfil profissional',
+      icon: Icons.work_outline_rounded,
+      colors: [Color(0xFF1785D1), Color(0xFF005A9E)],
+      url: _linkedInUrl,
     ),
     _PhoneApp(
       title: 'Nexus',
@@ -255,17 +279,17 @@ class _HomeScreen extends StatelessWidget {
           'Um produto real-time criado para tornar dados vivos, claros e imediatamente acionáveis.',
     ),
     _PhoneApp(
-      title: 'Contato',
-      subtitle: 'Vamos construir algo',
-      icon: Icons.alternate_email_rounded,
-      colors: [Color(0xFFFFB86B), Color(0xFFDB6238)],
-      isContact: true,
+      title: 'Sobre',
+      subtitle: 'Minha trajetória e propósito',
+      icon: Icons.person_outline_rounded,
+      colors: [Color(0xFF6EA8FF), Color(0xFF3657D6)],
+      isAbout: true,
     ),
   ];
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(24, 28, 24, 12),
+    padding: const EdgeInsets.fromLTRB(34, 34, 34, 16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -273,46 +297,45 @@ class _HomeScreen extends StatelessWidget {
           'HUGO OS',
           style: TextStyle(
             color: Colors.white.withValues(alpha: .46),
-            fontSize: 10,
+            fontSize: 13,
             fontWeight: FontWeight.w800,
-            letterSpacing: 2.2,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Explore meu trabalho.',
-          style: TextStyle(
-            fontSize: 29,
-            height: 1.05,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -1.2,
+            letterSpacing: 2.8,
           ),
         ),
         const SizedBox(height: 10),
+        const Text(
+          'Explore meu trabalho.',
+          style: TextStyle(
+            fontSize: 40,
+            height: 1.02,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -1.7,
+          ),
+        ),
+        const SizedBox(height: 14),
         Text(
           'Projetos, código e conexões em um só lugar.',
           style: TextStyle(
             color: Colors.white.withValues(alpha: .52),
-            fontSize: 13,
-            height: 1.45,
+            fontSize: 16,
+            height: 1.5,
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 44),
         Expanded(
           child: GridView.builder(
             physics: const BouncingScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
-              mainAxisSpacing: 24,
-              crossAxisSpacing: 15,
-              childAspectRatio: .76,
+              mainAxisSpacing: 30,
+              crossAxisSpacing: 20,
+              childAspectRatio: .82,
             ),
             itemCount: apps.length,
             itemBuilder: (context, index) =>
                 _AppIcon(app: apps[index], onTap: () => onOpen(apps[index])),
           ),
         ),
-        _Dock(apps: apps.take(3).toList(), onOpen: onOpen),
       ],
     ),
   );
@@ -338,19 +361,25 @@ class _AppIconState extends State<_AppIcon> {
     child: InkWell(
       onTap: widget.onTap,
       onHover: (value) => setState(() => hovered = value),
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(24),
       child: Column(
         children: [
           AnimatedScale(
             duration: 180.ms,
-            scale: hovered ? 1.06 : 1,
-            child: _AppGlyph(app: widget.app),
+            scale: hovered ? 1.08 : 1,
+            child: _AppGlyph(app: widget.app, size: 78),
           ),
-          const SizedBox(height: 7),
+          const SizedBox(height: 11),
           Text(
             widget.app.title,
             maxLines: 1,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -.1,
+            ),
           ),
         ],
       ),
@@ -385,35 +414,6 @@ class _AppGlyph extends StatelessWidget {
       ],
     ),
     child: Icon(app.icon, color: Colors.white, size: size * .42),
-  );
-}
-
-class _Dock extends StatelessWidget {
-  const _Dock({required this.apps, required this.onOpen});
-
-  final List<_PhoneApp> apps;
-  final ValueChanged<_PhoneApp> onOpen;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    height: 84,
-    padding: const EdgeInsets.symmetric(horizontal: 22),
-    decoration: BoxDecoration(
-      color: Colors.white.withValues(alpha: .075),
-      border: Border.all(color: Colors.white.withValues(alpha: .09)),
-      borderRadius: BorderRadius.circular(28),
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        for (final app in apps)
-          IconButton(
-            tooltip: app.title,
-            onPressed: () => onOpen(app),
-            icon: _AppGlyph(app: app, size: 52),
-          ),
-      ],
-    ),
   );
 }
 
@@ -473,6 +473,134 @@ class _AppScreen extends StatelessWidget {
           ),
         ),
         const Spacer(flex: 2),
+      ],
+    ),
+  );
+}
+
+class _AboutScreen extends StatelessWidget {
+  const _AboutScreen({super.key, required this.onBack});
+
+  final VoidCallback onBack;
+
+  static const _paragraphs = [
+    'Sou Desenvolvedor Full Stack apaixonado por transformar ideias em soluções digitais modernas, intuitivas e de alto desempenho.',
+    'Atualmente desenvolvo aplicações utilizando Flutter, .NET, React e tecnologias voltadas para sistemas em tempo real, sempre buscando criar experiências fluidas, escaláveis e bem estruturadas. Acredito que um bom software vai além de funcionar: ele precisa ser confiável, performático e agradável de usar.',
+    'Tenho grande interesse por arquitetura de software, aplicações offline-first, sincronização de dados, comunicação em tempo real e desenvolvimento multiplataforma. Gosto de compreender profundamente os desafios antes de propor soluções, priorizando código limpo, manutenção simples e uma excelente experiência para o usuário.',
+    'Acredito que os melhores resultados surgem da combinação entre curiosidade, aprendizado contínuo e atenção aos detalhes. Gosto de resolver problemas complexos criando soluções simples, equilibrando qualidade técnica com uma experiência intuitiva para quem utiliza o produto.',
+    'Estou em constante evolução, estudando novas tecnologias e aprimorando minhas habilidades para desenvolver produtos que gerem impacto real. Encaro cada projeto como uma oportunidade de aprender, evoluir e entregar algo melhor do que a versão anterior.',
+    'Meu objetivo é construir aplicações que unam qualidade técnica, desempenho e uma experiência que faça diferença para as pessoas.',
+  ];
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            IconButton(
+              tooltip: 'Voltar à tela inicial',
+              onPressed: onBack,
+              icon: const Icon(Icons.arrow_back_rounded),
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6EA8FF).withValues(alpha: .1),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(
+                  color: const Color(0xFF6EA8FF).withValues(alpha: .24),
+                ),
+              ),
+              child: const Text(
+                'SOBRE MIM',
+                style: TextStyle(
+                  color: Color(0xFF91BAFF),
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.4,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(4, 24, 4, 28),
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  width: 76,
+                  height: 76,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF6EA8FF), Color(0xFF3657D6)],
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x403657D6),
+                        blurRadius: 28,
+                        offset: Offset(0, 12),
+                      ),
+                    ],
+                  ),
+                  child: const Text(
+                    'HM',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -.7,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
+              const Text(
+                'Sobre mim',
+                style: TextStyle(
+                  fontSize: 40,
+                  height: 1,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -1.7,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _paragraphs.first,
+                style: const TextStyle(
+                  color: Color(0xFFE7E7EC),
+                  fontSize: 17,
+                  height: 1.55,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -.1,
+                ),
+              ),
+              const SizedBox(height: 28),
+              Divider(color: Colors.white.withValues(alpha: .1)),
+              const SizedBox(height: 20),
+              for (final paragraph in _paragraphs.skip(1)) ...[
+                Text(
+                  paragraph,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: .58),
+                    fontSize: 15,
+                    height: 1.65,
+                  ),
+                ),
+                const SizedBox(height: 22),
+              ],
+            ],
+          ),
+        ),
       ],
     ),
   );
@@ -827,6 +955,7 @@ class _PhoneApp {
     this.url,
     this.description,
     this.isContact = false,
+    this.isAbout = false,
   });
 
   final String title;
@@ -836,4 +965,5 @@ class _PhoneApp {
   final String? url;
   final String? description;
   final bool isContact;
+  final bool isAbout;
 }

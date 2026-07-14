@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../experience/presentation/experience_section.dart';
 import '../../phone/presentation/hugo_phone.dart';
 
 class IntroScreen extends StatelessWidget {
@@ -21,60 +22,99 @@ class IntroScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final reducedMotion = MediaQuery.disableAnimationsOf(context);
     return Scaffold(
-      body: Stack(
+      body: PageView(
+        scrollDirection: Axis.vertical,
         children: [
-          const Positioned.fill(child: _Atmosphere()),
-          const Positioned.fill(child: _ResponsiveHeroImage()),
-          SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final wide = constraints.maxWidth >= 760;
-                final horizontal = wide ? 64.0 : 24.0;
-                return SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(horizontal, 20, horizontal, 28),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - 48,
-                      maxWidth: 1180,
-                    ),
-                    child: Center(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _TopBar(
-                            themeMode: themeMode,
-                            onThemeChanged: onThemeChanged,
-                            onLocaleChanged: onLocaleChanged,
-                          ),
-                          SizedBox(height: wide ? 92 : 54),
-                          if (wide)
-                            Row(
-                              children: [
-                                const Expanded(flex: 11, child: SizedBox()),
-                                const SizedBox(width: 54),
-                                Expanded(
-                                  flex: 9,
-                                  child: _HeroCopy(
-                                    onContact: () => showHugoPhone(context),
-                                  ),
-                                ),
-                              ],
-                            )
-                          else ...[
-                            _HeroCopy(onContact: () => showHugoPhone(context)),
-                            const SizedBox(height: 54),
-                            const _MobilePortrait(),
-                          ],
-                          SizedBox(height: wide ? 76 : 52),
-                          const _CapabilityRail(),
-                        ],
+          Stack(
+            key: const ValueKey('hero-section'),
+            children: [
+              const Positioned.fill(child: _Atmosphere()),
+              const Positioned.fill(child: _ResponsiveHeroImage()),
+              SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wide = constraints.maxWidth >= 900;
+                    final compact = constraints.maxHeight < 760;
+                    final horizontal = wide
+                        ? 64.0
+                        : compact
+                        ? 18.0
+                        : 24.0;
+                    final vertical = compact ? 14.0 : 20.0;
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontal,
+                        vertical: vertical,
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 1180),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _TopBar(
+                                themeMode: themeMode,
+                                onThemeChanged: onThemeChanged,
+                                onLocaleChanged: onLocaleChanged,
+                              ),
+                              SizedBox(
+                                height: compact
+                                    ? 16
+                                    : wide
+                                    ? 36
+                                    : 28,
+                              ),
+                              Expanded(
+                                child: wide
+                                    ? Row(
+                                        children: [
+                                          const Expanded(
+                                            flex: 11,
+                                            child: SizedBox(),
+                                          ),
+                                          SizedBox(width: compact ? 28 : 54),
+                                          Expanded(
+                                            flex: 9,
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: _HeroCopy(
+                                                compact: compact,
+                                                onContact: () =>
+                                                    showHugoPhone(context),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          _HeroCopy(
+                                            compact: compact,
+                                            onContact: () =>
+                                                showHugoPhone(context),
+                                          ),
+                                          SizedBox(height: compact ? 12 : 24),
+                                          const Expanded(
+                                            child: _MobilePortrait(),
+                                          ),
+                                        ],
+                                      ),
+                              ),
+                              SizedBox(height: compact ? 10 : 24),
+                              _CapabilityRail(compact: compact),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
+          const ExperienceSection(),
         ],
       ),
     ).animate(target: reducedMotion ? 0 : 1).fadeIn(duration: 500.ms);
@@ -87,7 +127,7 @@ class _ResponsiveHeroImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      if (constraints.maxWidth < 760) return const SizedBox.shrink();
+      if (constraints.maxWidth < 900) return const SizedBox.shrink();
       return Stack(
         fit: StackFit.expand,
         children: [
@@ -120,9 +160,8 @@ class _MobilePortrait extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-    borderRadius: BorderRadius.circular(24),
-    child: AspectRatio(
-      aspectRatio: 16 / 10,
+    borderRadius: BorderRadius.circular(20),
+    child: SizedBox.expand(
       child: Image.asset(
         'assets/images/hugo-hero.png',
         fit: BoxFit.cover,
@@ -229,14 +268,19 @@ class _HeaderButton extends StatelessWidget {
 }
 
 class _HeroCopy extends StatelessWidget {
-  const _HeroCopy({required this.onContact});
+  const _HeroCopy({required this.onContact, required this.compact});
 
   final VoidCallback onContact;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final titleSize = width >= 900
+    final titleSize = compact
+        ? width >= 900
+              ? 46.0
+              : 40.0
+        : width >= 900
         ? 70.0
         : width >= 400
         ? 54.0
@@ -265,7 +309,7 @@ class _HeroCopy extends StatelessWidget {
             ),
           ],
         ).animate().fadeIn(delay: 180.ms).slideX(begin: -.08, end: 0),
-        const SizedBox(height: 22),
+        SizedBox(height: compact ? 12 : 22),
         Text(
               'Hugo Henrique\nMartins.',
               style: TextStyle(
@@ -278,15 +322,15 @@ class _HeroCopy extends StatelessWidget {
             .animate()
             .fadeIn(delay: 260.ms, duration: 650.ms)
             .slideY(begin: .12, end: 0, curve: Curves.easeOutCubic),
-        const SizedBox(height: 26),
+        SizedBox(height: compact ? 14 : 26),
         ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 570),
               child: Text(
                 AppStrings.of(context).description,
                 style: TextStyle(
                   color: context.portfolioColors.muted,
-                  fontSize: 16,
-                  height: 1.65,
+                  fontSize: compact ? 13.5 : 16,
+                  height: compact ? 1.4 : 1.65,
                   letterSpacing: -.1,
                 ),
               ),
@@ -294,7 +338,7 @@ class _HeroCopy extends StatelessWidget {
             .animate()
             .fadeIn(delay: 390.ms, duration: 600.ms)
             .slideY(begin: .12, end: 0),
-        const SizedBox(height: 34),
+        SizedBox(height: compact ? 16 : 34),
         _ContactButton(onPressed: onContact)
             .animate()
             .fadeIn(delay: 520.ms, duration: 500.ms)
@@ -367,13 +411,18 @@ class _ContactButtonState extends State<_ContactButton> {
 }
 
 class _CapabilityRail extends StatelessWidget {
-  const _CapabilityRail();
+  const _CapabilityRail({required this.compact});
+
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final capabilities = AppStrings.of(context).capabilities;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+      padding: EdgeInsets.symmetric(
+        vertical: compact ? 10 : 18,
+        horizontal: compact ? 12 : 20,
+      ),
       decoration: BoxDecoration(
         color: context.portfolioColors.surface.withValues(alpha: .56),
         borderRadius: BorderRadius.circular(18),
