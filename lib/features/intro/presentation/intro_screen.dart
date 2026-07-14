@@ -6,7 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../experience/presentation/experience_section.dart';
 import '../../phone/presentation/hugo_phone.dart';
 
-class IntroScreen extends StatelessWidget {
+class IntroScreen extends StatefulWidget {
   const IntroScreen({
     super.key,
     required this.themeMode,
@@ -19,10 +19,30 @@ class IntroScreen extends StatelessWidget {
   final VoidCallback onLocaleChanged;
 
   @override
+  State<IntroScreen> createState() => _IntroScreenState();
+}
+
+class _IntroScreenState extends State<IntroScreen> {
+  final _pageController = PageController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _goToExperience() => _pageController.animateToPage(
+    1,
+    duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : 650.ms,
+    curve: Curves.easeOutCubic,
+  );
+
+  @override
   Widget build(BuildContext context) {
     final reducedMotion = MediaQuery.disableAnimationsOf(context);
     return Scaffold(
       body: PageView(
+        controller: _pageController,
         scrollDirection: Axis.vertical,
         children: [
           Stack(
@@ -53,9 +73,9 @@ class IntroScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               _TopBar(
-                                themeMode: themeMode,
-                                onThemeChanged: onThemeChanged,
-                                onLocaleChanged: onLocaleChanged,
+                                themeMode: widget.themeMode,
+                                onThemeChanged: widget.onThemeChanged,
+                                onLocaleChanged: widget.onLocaleChanged,
                               ),
                               SizedBox(
                                 height: compact
@@ -81,6 +101,7 @@ class IntroScreen extends StatelessWidget {
                                                 compact: compact,
                                                 onContact: () =>
                                                     showHugoPhone(context),
+                                                onExperience: _goToExperience,
                                               ),
                                             ),
                                           ),
@@ -94,6 +115,7 @@ class IntroScreen extends StatelessWidget {
                                             compact: compact,
                                             onContact: () =>
                                                 showHugoPhone(context),
+                                            onExperience: _goToExperience,
                                           ),
                                           SizedBox(height: compact ? 12 : 24),
                                           const Expanded(
@@ -268,9 +290,14 @@ class _HeaderButton extends StatelessWidget {
 }
 
 class _HeroCopy extends StatelessWidget {
-  const _HeroCopy({required this.onContact, required this.compact});
+  const _HeroCopy({
+    required this.onContact,
+    required this.onExperience,
+    required this.compact,
+  });
 
   final VoidCallback onContact;
+  final VoidCallback onExperience;
   final bool compact;
 
   @override
@@ -339,13 +366,52 @@ class _HeroCopy extends StatelessWidget {
             .fadeIn(delay: 390.ms, duration: 600.ms)
             .slideY(begin: .12, end: 0),
         SizedBox(height: compact ? 16 : 34),
-        _ContactButton(onPressed: onContact)
+        Wrap(
+              spacing: 12,
+              runSpacing: 10,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                _ContactButton(onPressed: onContact),
+                _ExperienceButton(onPressed: onExperience, compact: compact),
+              ],
+            )
             .animate()
             .fadeIn(delay: 520.ms, duration: 500.ms)
             .slideY(begin: .2, end: 0, curve: Curves.easeOutCubic),
       ],
     );
   }
+}
+
+class _ExperienceButton extends StatelessWidget {
+  const _ExperienceButton({required this.onPressed, required this.compact});
+
+  final VoidCallback onPressed;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: 'Ir para ${AppStrings.of(context).experienceCta}',
+    child: OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: const Icon(Icons.arrow_downward_rounded, size: 17),
+      label: Text(AppStrings.of(context).experienceCta),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 15 : 19,
+          vertical: compact ? 14 : 17,
+        ),
+        textStyle: TextStyle(
+          fontSize: compact ? 11.5 : 13,
+          fontWeight: FontWeight.w700,
+        ),
+        side: BorderSide(color: context.portfolioColors.stroke),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
+      ),
+    ),
+  );
 }
 
 class _ContactButton extends StatefulWidget {

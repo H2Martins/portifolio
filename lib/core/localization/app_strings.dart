@@ -7,6 +7,7 @@ class AppStrings {
     required this.description,
     required this.contact,
     required this.contactSemantics,
+    required this.experienceCta,
     required this.capabilities,
     required this.themeTooltip,
     required this.languageTooltip,
@@ -17,6 +18,7 @@ class AppStrings {
   final String description;
   final String contact;
   final String contactSemantics;
+  final String experienceCta;
   final List<String> capabilities;
   final String themeTooltip;
   final String languageTooltip;
@@ -27,7 +29,8 @@ class AppStrings {
     description:
         'Crio produtos digitais resilientes onde interfaces bem pensadas encontram arquitetura de verdade — de experiências mobile em tempo real a APIs de alta performance.',
     contact: 'Vamos começar',
-    contactSemantics: 'Abrir o Hugo OS',
+    contactSemantics: 'Ir para a seção de contato',
+    experienceCta: 'Experiência profissional',
     capabilities: [
       'MOBILE',
       'SISTEMAS EM TEMPO REAL',
@@ -44,7 +47,8 @@ class AppStrings {
     description:
         'I engineer resilient digital products where thoughtful interfaces meet serious architecture — from real-time mobile experiences to high-performance APIs.',
     contact: 'Let’s begin',
-    contactSemantics: 'Open Hugo OS',
+    contactSemantics: 'Go to the contact section',
+    experienceCta: 'Professional experience',
     capabilities: [
       'MOBILE',
       'REAL-TIME SYSTEMS',

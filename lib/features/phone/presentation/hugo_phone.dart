@@ -147,55 +147,59 @@ class _PhoneFrameState extends State<_PhoneFrame> {
         borderRadius: BorderRadius.circular(widget.fullScreen ? 0 : 45),
         child: ColoredBox(
           color: const Color(0xFF0B0C10),
-          child: Stack(
-            children: [
-              const Positioned.fill(child: _PhoneWallpaper()),
-              SafeArea(
-                child: Column(
-                  children: [
-                    const _StatusBar(),
-                    Expanded(
-                      child: AnimatedSwitcher(
-                        duration: 350.ms,
-                        switchInCurve: Curves.easeOutCubic,
-                        switchOutCurve: Curves.easeInCubic,
-                        transitionBuilder: (child, animation) => FadeTransition(
-                          opacity: animation,
-                          child: ScaleTransition(
-                            scale: Tween(
-                              begin: .96,
-                              end: 1.0,
-                            ).animate(animation),
-                            child: child,
-                          ),
-                        ),
-                        child: _openApp == null
-                            ? _HomeScreen(
-                                key: const ValueKey('home'),
-                                onOpen: _open,
-                              )
-                            : _openApp!.isContact
-                            ? _ContactScreen(
-                                key: const ValueKey('contact'),
-                                onBack: _goHome,
-                              )
-                            : _openApp!.isAbout
-                            ? _AboutScreen(
-                                key: const ValueKey('about'),
-                                onBack: _goHome,
-                              )
-                            : _AppScreen(
-                                key: ValueKey(_openApp!.title),
-                                app: _openApp!,
-                                onBack: _goHome,
+          child: DefaultTextStyle.merge(
+            style: const TextStyle(fontSize: 16),
+            child: Stack(
+              children: [
+                const Positioned.fill(child: _PhoneWallpaper()),
+                SafeArea(
+                  child: Column(
+                    children: [
+                      const _StatusBar(),
+                      Expanded(
+                        child: AnimatedSwitcher(
+                          duration: 350.ms,
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
+                          transitionBuilder: (child, animation) =>
+                              FadeTransition(
+                                opacity: animation,
+                                child: ScaleTransition(
+                                  scale: Tween(
+                                    begin: .96,
+                                    end: 1.0,
+                                  ).animate(animation),
+                                  child: child,
+                                ),
                               ),
+                          child: _openApp == null
+                              ? _HomeScreen(
+                                  key: const ValueKey('home'),
+                                  onOpen: _open,
+                                )
+                              : _openApp!.isContact
+                              ? _ContactScreen(
+                                  key: const ValueKey('contact'),
+                                  onBack: _goHome,
+                                )
+                              : _openApp!.isAbout
+                              ? _AboutScreen(
+                                  key: const ValueKey('about'),
+                                  onBack: _goHome,
+                                )
+                              : _AppScreen(
+                                  key: ValueKey(_openApp!.title),
+                                  app: _openApp!,
+                                  onBack: _goHome,
+                                ),
+                        ),
                       ),
-                    ),
-                    _HomeIndicator(onTap: _goHome),
-                  ],
+                      _HomeIndicator(onTap: _goHome),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -213,7 +217,7 @@ class _StatusBar extends StatelessWidget {
       children: [
         const Text(
           '09:41',
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
         const Spacer(),
         Container(
@@ -297,7 +301,7 @@ class _HomeScreen extends StatelessWidget {
           'HUGO OS',
           style: TextStyle(
             color: Colors.white.withValues(alpha: .46),
-            fontSize: 13,
+            fontSize: 16,
             fontWeight: FontWeight.w800,
             letterSpacing: 2.8,
           ),
@@ -317,7 +321,7 @@ class _HomeScreen extends StatelessWidget {
           'Projetos, código e conexões em um só lugar.',
           style: TextStyle(
             color: Colors.white.withValues(alpha: .52),
-            fontSize: 16,
+            fontSize: 19,
             height: 1.5,
           ),
         ),
@@ -376,7 +380,7 @@ class _AppIconState extends State<_AppIcon> {
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 17,
               fontWeight: FontWeight.w600,
               letterSpacing: -.1,
             ),
@@ -451,7 +455,7 @@ class _AppScreen extends StatelessWidget {
           app.description ?? app.subtitle,
           style: TextStyle(
             color: Colors.white.withValues(alpha: .58),
-            fontSize: 15,
+            fontSize: 18,
             height: 1.55,
           ),
         ),
@@ -466,7 +470,7 @@ class _AppScreen extends StatelessWidget {
           child: const Text(
             'PROJETO EM BREVE',
             style: TextStyle(
-              fontSize: 9,
+              fontSize: 12,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.4,
             ),
@@ -519,7 +523,7 @@ class _AboutScreen extends StatelessWidget {
                 'SOBRE MIM',
                 style: TextStyle(
                   color: Color(0xFF91BAFF),
-                  fontSize: 9,
+                  fontSize: 12,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.4,
                 ),
@@ -556,7 +560,7 @@ class _AboutScreen extends StatelessWidget {
                   child: const Text(
                     'HM',
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 26,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -.7,
                     ),
@@ -578,7 +582,7 @@ class _AboutScreen extends StatelessWidget {
                 _paragraphs.first,
                 style: const TextStyle(
                   color: Color(0xFFE7E7EC),
-                  fontSize: 17,
+                  fontSize: 20,
                   height: 1.55,
                   fontWeight: FontWeight.w500,
                   letterSpacing: -.1,
@@ -592,7 +596,7 @@ class _AboutScreen extends StatelessWidget {
                   paragraph,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: .58),
-                    fontSize: 15,
+                    fontSize: 18,
                     height: 1.65,
                   ),
                 ),
@@ -655,7 +659,7 @@ class _ContactScreen extends StatelessWidget {
                     'DISPONÍVEL',
                     style: TextStyle(
                       color: Color(0xFF8FE8BD),
-                      fontSize: 8,
+                      fontSize: 11,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
                     ),
@@ -694,7 +698,7 @@ class _ContactScreen extends StatelessWidget {
                     child: const Text(
                       'HM',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 22,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -.5,
                       ),
@@ -718,7 +722,7 @@ class _ContactScreen extends StatelessWidget {
                           'Full Stack Developer',
                           style: TextStyle(
                             color: Color(0xFF999AA4),
-                            fontSize: 12,
+                            fontSize: 15,
                           ),
                         ),
                       ],
@@ -741,7 +745,7 @@ class _ContactScreen extends StatelessWidget {
                 'Escolha o canal mais conveniente. Estou sempre aberto a boas conversas e novos desafios.',
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: .5),
-                  fontSize: 13,
+                  fontSize: 16,
                   height: 1.5,
                 ),
               ),
@@ -843,7 +847,7 @@ class _ContactTileState extends State<_ContactTile> {
                       widget.label,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: .35),
-                        fontSize: 8,
+                        fontSize: 11,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.4,
                       ),
@@ -852,7 +856,7 @@ class _ContactTileState extends State<_ContactTile> {
                     Text(
                       widget.value,
                       style: const TextStyle(
-                        fontSize: 13,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

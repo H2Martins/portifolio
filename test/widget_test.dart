@@ -39,6 +39,7 @@ void main() {
     expect(find.text('Hugo Henrique\nMartins.'), findsOneWidget);
     expect(find.text('DESENVOLVEDOR FULL STACK'), findsOneWidget);
     expect(find.text('Vamos começar'), findsOneWidget);
+    expect(find.text('Experiência profissional'), findsOneWidget);
     expect(find.text('PT'), findsOneWidget);
 
     await tester.tap(find.text('PT'));
@@ -46,6 +47,7 @@ void main() {
 
     expect(find.text('FULL STACK DEVELOPER'), findsOneWidget);
     expect(find.text('Let’s begin'), findsOneWidget);
+    expect(find.text('Professional experience'), findsOneWidget);
     expect(find.text('EN'), findsOneWidget);
   });
 
@@ -59,7 +61,7 @@ void main() {
 
     await tester.pumpWidget(const PortfolioApp());
     await tester.pump(const Duration(milliseconds: 900));
-    await tester.fling(find.byType(PageView), const Offset(0, -700), 1200);
+    await tester.tap(find.text('Experiência profissional'));
     await tester.pumpAndSettle();
 
     expect(find.text('Experiência Profissional'), findsOneWidget);
