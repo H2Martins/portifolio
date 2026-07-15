@@ -94,17 +94,48 @@ void main() {
     expect(find.text('HUGO OS'), findsOneWidget);
     expect(find.text('LinkedIn'), findsWidgets);
     expect(find.text('GitHub'), findsWidgets);
-    expect(find.text('Nexus'), findsOneWidget);
-    expect(find.text('Pulse'), findsOneWidget);
+    expect(find.text('Ludare'), findsOneWidget);
+    expect(find.text('Barbearia'), findsOneWidget);
 
-    await tester.tap(find.text('Nexus'));
+    await tester.tap(find.text('Ludare'));
     await tester.pumpAndSettle();
 
-    expect(find.text('PROJETO EM BREVE'), findsOneWidget);
-    expect(find.textContaining('plataforma conectada'), findsOneWidget);
+    final ludareContent = find.descendant(
+      of: find.byKey(const ValueKey('ludare')),
+      matching: find.byType(ListView),
+    );
+    await tester.drag(ludareContent, const Offset(0, -620));
+    await tester.pumpAndSettle();
+
+    expect(find.text('LudareApp'), findsOneWidget);
+    expect(find.textContaining('comunicação em tempo real'), findsOneWidget);
+
+    await tester.drag(ludareContent, const Offset(0, -520));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Visitar site da Ludare'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Voltar à tela inicial'));
     await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Barbearia'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Barbearia Carvalho'), findsOneWidget);
+    expect(find.text('Flutter · SQLite · Windows'), findsOneWidget);
+
+    final barbeariaContent = find.descendant(
+      of: find.byKey(const ValueKey('barbearia')),
+      matching: find.byType(ListView),
+    );
+    await tester.drag(barbeariaContent, const Offset(0, -420));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ver código no GitHub'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Voltar à tela inicial'));
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text('Sobre'));
     await tester.pumpAndSettle();
 

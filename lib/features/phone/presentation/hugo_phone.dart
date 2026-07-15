@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 const _linkedInUrl =
     'https://www.linkedin.com/in/hugo-henrique-martins-54198016a/';
 const _githubUrl = 'https://github.com/H2Martins';
+const _barbeariaGithubUrl = 'https://github.com/H2Martins/barbearia_carvalho';
 
 Future<void> showHugoPhone(BuildContext context) => showGeneralDialog<void>(
   context: context,
@@ -177,6 +178,16 @@ class _PhoneFrameState extends State<_PhoneFrame> {
                                   key: const ValueKey('home'),
                                   onOpen: _open,
                                 )
+                              : _openApp!.isBarbearia
+                              ? _BarbeariaScreen(
+                                  key: const ValueKey('barbearia'),
+                                  onBack: _goHome,
+                                )
+                              : _openApp!.isLudare
+                              ? _LudareScreen(
+                                  key: const ValueKey('ludare'),
+                                  onBack: _goHome,
+                                )
                               : _openApp!.isContact
                               ? _ContactScreen(
                                   key: const ValueKey('contact'),
@@ -187,10 +198,9 @@ class _PhoneFrameState extends State<_PhoneFrame> {
                                   key: const ValueKey('about'),
                                   onBack: _goHome,
                                 )
-                              : _AppScreen(
-                                  key: ValueKey(_openApp!.title),
-                                  app: _openApp!,
-                                  onBack: _goHome,
+                              : _HomeScreen(
+                                  key: const ValueKey('home'),
+                                  onOpen: _open,
                                 ),
                         ),
                       ),
@@ -267,20 +277,20 @@ class _HomeScreen extends StatelessWidget {
       url: _linkedInUrl,
     ),
     _PhoneApp(
-      title: 'Nexus',
-      subtitle: 'Projeto conceito · em breve',
-      icon: Icons.hub_outlined,
-      colors: [Color(0xFF9B8CFF), Color(0xFF5542D6)],
-      description:
-          'Uma plataforma conectada, pensada para transformar fluxos complexos em uma experiência simples.',
+      title: 'Ludare',
+      subtitle: 'Projeto atual',
+      icon: Icons.account_balance_rounded,
+      colors: [Color(0xFF3155C7), Color(0xFF172E87)],
+      assetPath: 'assets/images/ludare-icon.png',
+      isLudare: true,
     ),
     _PhoneApp(
-      title: 'Pulse',
-      subtitle: 'Projeto conceito · em breve',
-      icon: Icons.graphic_eq_rounded,
-      colors: [Color(0xFF72E6B1), Color(0xFF168867)],
-      description:
-          'Um produto real-time criado para tornar dados vivos, claros e imediatamente acionáveis.',
+      title: 'Barbearia',
+      subtitle: 'Gestão desktop',
+      icon: Icons.content_cut_rounded,
+      colors: [Color(0xFFBDA86D), Color(0xFF41381F)],
+      assetPath: 'assets/images/barbearia-carvalho-logo.png',
+      isBarbearia: true,
     ),
     _PhoneApp(
       title: 'Sobre',
@@ -417,66 +427,542 @@ class _AppGlyph extends StatelessWidget {
         ),
       ],
     ),
-    child: Icon(app.icon, color: Colors.white, size: size * .42),
+    clipBehavior: Clip.antiAlias,
+    child: app.assetPath == null
+        ? Icon(app.icon, color: Colors.white, size: size * .42)
+        : ColoredBox(
+            color: Colors.white,
+            child: Padding(
+              padding: EdgeInsets.all(size * .08),
+              child: Image.asset(
+                app.assetPath!,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
+              ),
+            ),
+          ),
   );
 }
 
-class _AppScreen extends StatelessWidget {
-  const _AppScreen({super.key, required this.app, required this.onBack});
+class _BarbeariaScreen extends StatelessWidget {
+  const _BarbeariaScreen({super.key, required this.onBack});
 
-  final _PhoneApp app;
   final VoidCallback onBack;
+
+  Future<void> _openRepository(BuildContext context) async {
+    final opened = await launchUrl(
+      Uri.parse(_barbeariaGithubUrl),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível abrir o repositório.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(22, 12, 22, 20),
+    padding: const EdgeInsets.fromLTRB(24, 12, 24, 22),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(
-          tooltip: 'Voltar à tela inicial',
-          onPressed: onBack,
-          icon: const Icon(Icons.arrow_back_rounded),
-        ),
-        const Spacer(),
-        _AppGlyph(app: app, size: 78),
-        const SizedBox(height: 24),
-        Text(
-          app.title,
-          style: const TextStyle(
-            fontSize: 38,
-            height: 1,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -1.5,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          app.description ?? app.subtitle,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: .58),
-            fontSize: 18,
-            height: 1.55,
-          ),
-        ),
-        const SizedBox(height: 34),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          decoration: BoxDecoration(
-            color: app.colors.first.withValues(alpha: .14),
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: app.colors.first.withValues(alpha: .3)),
-          ),
-          child: const Text(
-            'PROJETO EM BREVE',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.4,
+        Row(
+          children: [
+            IconButton(
+              tooltip: 'Voltar à tela inicial',
+              onPressed: onBack,
+              icon: const Icon(Icons.arrow_back_rounded),
             ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD6C48F).withValues(alpha: .1),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(
+                  color: const Color(0xFFD6C48F).withValues(alpha: .28),
+                ),
+              ),
+              child: const Text(
+                'FLUTTER DESKTOP',
+                style: TextStyle(
+                  color: Color(0xFFE7D7A6),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.1,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(2, 20, 2, 18),
+            children: [
+              const _BarbeariaPreview(),
+              const SizedBox(height: 28),
+              Row(
+                children: [
+                  Container(
+                    width: 66,
+                    height: 66,
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF100E04),
+                      borderRadius: BorderRadius.circular(19),
+                      border: Border.all(
+                        color: const Color(0xFFD6C48F).withValues(alpha: .3),
+                      ),
+                    ),
+                    child: Image.asset(
+                      'assets/images/barbearia-carvalho-logo.png',
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Barbearia Carvalho',
+                          style: TextStyle(
+                            fontSize: 29,
+                            height: 1,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -1.1,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Flutter · SQLite · Windows',
+                          style: TextStyle(
+                            color: Color(0xFFD6C48F),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Sistema de gestão desenvolvido em Flutter Desktop para centralizar agenda, profissionais, serviços, produtos e controle financeiro de uma barbearia.',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: .68),
+                  fontSize: 18,
+                  height: 1.58,
+                ),
+              ),
+              const SizedBox(height: 22),
+              const Wrap(
+                spacing: 9,
+                runSpacing: 9,
+                children: [
+                  _ProjectFeatureChip('Agenda'),
+                  _ProjectFeatureChip('Financeiro'),
+                  _ProjectFeatureChip('Comissões'),
+                  _ProjectFeatureChip('Relatórios PDF'),
+                  _ProjectFeatureChip('Backup local'),
+                  _ProjectFeatureChip('Offline'),
+                ],
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () => _openRepository(context),
+                  icon: const Icon(Icons.code_rounded),
+                  label: const Text('Ver código no GitHub'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFFD6C48F),
+                    foregroundColor: const Color(0xFF171307),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(17),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        const Spacer(flex: 2),
+      ],
+    ),
+  );
+}
+
+class _BarbeariaPreview extends StatelessWidget {
+  const _BarbeariaPreview();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    height: 290,
+    padding: const EdgeInsets.all(15),
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF292516), Color(0xFF0E0D08)],
+      ),
+      borderRadius: BorderRadius.circular(26),
+      border: Border.all(color: const Color(0xFFD6C48F).withValues(alpha: .22)),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x383F3518),
+          blurRadius: 34,
+          offset: Offset(0, 16),
+        ),
+      ],
+    ),
+    child: Row(
+      children: [
+        Container(
+          width: 86,
+          padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF090905),
+            borderRadius: BorderRadius.circular(17),
+          ),
+          child: Column(
+            children: [
+              Image.asset(
+                'assets/images/barbearia-carvalho-logo.png',
+                width: 48,
+                height: 38,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 25),
+              for (final icon in const [
+                Icons.dashboard_rounded,
+                Icons.calendar_month_rounded,
+                Icons.people_alt_rounded,
+                Icons.payments_rounded,
+              ]) ...[
+                Icon(icon, size: 20, color: Colors.white54),
+                const SizedBox(height: 19),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(width: 13),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Visão geral',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 13),
+              const Row(
+                children: [
+                  Expanded(
+                    child: _PreviewMetric(label: 'HOJE', value: 'R\$ 840'),
+                  ),
+                  SizedBox(width: 9),
+                  Expanded(
+                    child: _PreviewMetric(label: 'AGENDA', value: '12'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(13),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: .055),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Próximos horários',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 13),
+                      for (final time in const ['09:30', '10:15', '11:00'])
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 9),
+                          child: Row(
+                            children: [
+                              Text(
+                                time,
+                                style: const TextStyle(
+                                  color: Color(0xFFD6C48F),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(width: 9),
+                              Expanded(
+                                child: Container(
+                                  height: 7,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white12,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _PreviewMetric extends StatelessWidget {
+  const _PreviewMetric({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.white.withValues(alpha: .06),
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white38,
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+        ),
+      ],
+    ),
+  );
+}
+
+class _ProjectFeatureChip extends StatelessWidget {
+  const _ProjectFeatureChip(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+    decoration: BoxDecoration(
+      color: const Color(0xFFD6C48F).withValues(alpha: .08),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: const Color(0xFFD6C48F).withValues(alpha: .18)),
+    ),
+    child: Text(
+      label,
+      style: const TextStyle(
+        color: Color(0xFFE1D19F),
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+  );
+}
+
+class _LudareScreen extends StatelessWidget {
+  const _LudareScreen({super.key, required this.onBack});
+
+  final VoidCallback onBack;
+
+  Future<void> _openWebsite(BuildContext context) async {
+    final opened = await launchUrl(
+      Uri.parse('https://ludare.site/'),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível abrir o site.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(24, 12, 24, 22),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            IconButton(
+              tooltip: 'Voltar à tela inicial',
+              onPressed: onBack,
+              icon: const Icon(Icons.arrow_back_rounded),
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF72E6B1).withValues(alpha: .1),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(
+                  color: const Color(0xFF72E6B1).withValues(alpha: .24),
+                ),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _StatusDot(),
+                  SizedBox(width: 8),
+                  Text(
+                    'PROJETO ATUAL',
+                    style: TextStyle(
+                      color: Color(0xFF8FE8BD),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(2, 20, 2, 18),
+            children: [
+              AspectRatio(
+                aspectRatio: 941 / 1672,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF18203C), Color(0xFF0D1020)],
+                    ),
+                    borderRadius: BorderRadius.circular(26),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: .1),
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x403155C7),
+                        blurRadius: 30,
+                        offset: Offset(0, 14),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: Image.asset(
+                      'assets/images/ludare-app-screen.png',
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                      alignment: Alignment.topCenter,
+                      filterQuality: FilterQuality.high,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
+              Row(
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: Image.asset(
+                        'assets/images/ludare-icon.png',
+                        fit: BoxFit.contain,
+                        filterQuality: FilterQuality.high,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'LudareApp',
+                          style: TextStyle(
+                            fontSize: 34,
+                            height: 1,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -1.4,
+                          ),
+                        ),
+                        SizedBox(height: 7),
+                        Text(
+                          'Flutter · .NET · Real-time',
+                          style: TextStyle(
+                            color: Color(0xFF9B8CFF),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Contribuí para o desenvolvimento do LudareApp, implementando funcionalidades em Flutter e .NET com foco em comunicação em tempo real, sincronização de dados, integrações com APIs e melhoria contínua da experiência do usuário.',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: .62),
+                  fontSize: 18,
+                  height: 1.62,
+                ),
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () => _openWebsite(context),
+                  icon: const Icon(Icons.arrow_outward_rounded),
+                  label: const Text('Visitar site da Ludare'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(17),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     ),
   );
@@ -957,9 +1443,11 @@ class _PhoneApp {
     required this.icon,
     required this.colors,
     this.url,
-    this.description,
+    this.assetPath,
     this.isContact = false,
     this.isAbout = false,
+    this.isLudare = false,
+    this.isBarbearia = false,
   });
 
   final String title;
@@ -967,7 +1455,9 @@ class _PhoneApp {
   final IconData icon;
   final List<Color> colors;
   final String? url;
-  final String? description;
+  final String? assetPath;
   final bool isContact;
   final bool isAbout;
+  final bool isLudare;
+  final bool isBarbearia;
 }
